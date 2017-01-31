@@ -1,0 +1,3 @@
+import ctypes
+
+ffi=ctypes.CDLL("./ffi_kadai_c.so")

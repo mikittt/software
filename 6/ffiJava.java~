@@ -1,0 +1,13 @@
+import java.io.*;
+
+public class ffiJava{
+    private native double sinc(double c);
+    private native void hello (String str);
+    
+    public static void main(String argv[]){
+	ffiJava t =new ffiJava();
+	System.load Library("ffiJava");
+	System.out.print("hello"); t.helo("world");
+	System.out.println("sinc(1) = "+t.sinc(1.0f));
+    }
+}

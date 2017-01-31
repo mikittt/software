@@ -1,0 +1,4 @@
+(defun count_a (a)
+  (setq count 0)
+  (dolist (x (a))
+    (if (eql x 'a)(+ count 1))))

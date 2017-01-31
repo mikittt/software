@@ -1,0 +1,34 @@
+(load "models/room73b2-scene.l")
+(load "models/h7-robot.l")
+(setq *room* (room73b2))
+(setq *robot* (h7))
+;;初期姿勢
+(send *robot* :reset-pose)
+;;ロボットの移動
+;;(send *room* :spots)で部屋内の代表的な座標を取得
+(send *robot* :move-to (send *room* :spot "cook-spot") :world)
+(send *robot* :locate #f(0 0 550))
+#|
+(send *irtviewer* :look-all
+      (geo::make-bounding-box
+       (flatten (send-all (send *robot* :bodies) :vertices))))
+|#
+(setq *kettle* (send *room* :object "room73b2-kettle"))
+;;環境モデルの初期化直後は物体は部屋にassocされているので注意
+(if (send *kettle* :parent) (send (send *kettle* :parent) :dissoc *kettle*))
+;;ロボットの視線を対象物に向ける
+(send *robot* :head :look-at (send *kettle* :worldpos))
+;;今回、対象物体が:handleメソッドとして記述されていて、メソッドはリストを返す
+(send *robot* :larm :inverse-kinematics
+      (car (send *kettle* :handle))
+      :link-list (send *robot* :link-list (send *robot* :larm :end-coords :parent))
+      :move-target (send *robot* :larm :end-coords)
+      :rotation-axis :z
+      :debug-view t)
+;;持ち上げるには、まずロボットの手先と対象物体を連結
+(send *robot* :larm :end-coords :assoc *kettle*)
+;;100メートル持ち上げ、その時look-at-targetをtとして首を常に対象へ
+(send *robot* :larm :move-end-pos #f(-50 0 50) :world
+      :debug-view t :look-at-target t)
+(objects (list *room* *robot*))
+
